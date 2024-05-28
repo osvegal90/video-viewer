@@ -2,8 +2,8 @@ import "./App.css";
 import CourseSection from "./component/CourseSection";
 import ContentPlayer from "./component/ContentPlayer";
 import { useEffect, useState } from "react";
-//import courseStructure from "./assets/course_nextjs_1/structure.json";
-import courseStructure from "./assets/course_nextjs_2/structure.json";
+//import courseStructure from "./assets/courses/course_nextjs_1/structure.json";
+import courseStructure from "./assets/courses/course_nextjs_2/structure.json";
 
 import useContentStore from "./store";
 import LessonSection from "./entities/LessonSection";
@@ -190,7 +190,7 @@ function App() {
         <CourseSection sections={sections} onSelectContent={onSelectContent} />
       </div>
       <div className="layout-video">
-        <ContentPlayer video={content?.activeSrc || ""} />
+        <ContentPlayer src={content?.activeSrc || ""} />
       </div>
     </div>
   );

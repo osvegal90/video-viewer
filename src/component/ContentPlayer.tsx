@@ -1,14 +1,14 @@
 interface Props {
-  video: string;
+  src: string;
 }
 
-const ContentPlayer = ({ video }: Props) => {
-  if (video.includes(".pdf"))
+const ContentPlayer = ({ src }: Props) => {
+  if (src.includes(".pdf"))
     return (
-      <embed src={video} width="100%" height="100%" type="application/pdf" />
+      <embed src={src} width="100%" height="100%" type="application/pdf" />
     );
 
-  return <video width="100%" controls src={video} />;
+  return <video width="100%" controls src={src} />;
 };
 
 export default ContentPlayer;
