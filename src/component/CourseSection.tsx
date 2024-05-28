@@ -37,7 +37,7 @@ const CourseSection = ({ sections, onSelectContent }: Props) => {
                     onSelectContent(section.name, v.name);
                   }}
                   className={[
-                    "btn my-1 w-full rounded-none text-sm text-left inline",
+                    "btn my-1 w-full rounded-none text-sm text-left inline h-auto",
                     `${
                       activeContent == v.name && activeSection == section.name
                         ? "btn-primary"

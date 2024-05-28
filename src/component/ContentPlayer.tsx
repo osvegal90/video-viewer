@@ -8,7 +8,7 @@ const ContentPlayer = ({ src }: Props) => {
       <embed src={src} width="100%" height="100%" type="application/pdf" />
     );
 
-  return <video width="100%" controls src={src} />;
+  return <video width="100%" controls src={src} autoPlay />;
 };
 
 export default ContentPlayer;
