@@ -1,24 +1,24 @@
 import useContentStore from "../store";
 
 interface Props {
-  onNext: () => void;
-  onPrevious: () => void;
+  onNextContent: () => void;
+  onPreviousContent: () => void;
 }
 
-const CourseControls = ({ onNext, onPrevious }: Props) => {
+const CourseControls = ({ onNextContent, onPreviousContent }: Props) => {
   const { content } = useContentStore();
 
   return (
     <>
       <button
-        onClick={onPrevious}
+        onClick={onPreviousContent}
         className="btn btn-secondary mr-2"
         disabled={!content.previousContent}
       >
         Previous Lesson
       </button>
       <button
-        onClick={onNext}
+        onClick={onNextContent}
         className="btn btn-accent"
         disabled={!content.nextSection}
       >

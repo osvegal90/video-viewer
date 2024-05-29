@@ -4,8 +4,8 @@ import ContentPlayer from "./component/ContentPlayer";
 import { useEffect, useState } from "react";
 //import courseStructure from "./assets/courses/course_nextjs_1/structure.json";
 //import courseStructure from "./assets/courses/course_nextjs_2/structure.json";
-//import courseStructure from "./assets/courses/course_react_1/structure.json";
-import courseStructure from "./assets/courses/course_react_2/structure.json";
+import courseStructure from "./assets/courses/course_react_1/structure.json";
+//import courseStructure from "./assets/courses/course_react_2/structure.json";
 
 import useContentStore from "./store";
 import LessonSection from "./entities/LessonSection";
@@ -18,7 +18,7 @@ function App() {
   const [totalCourses, setTotalCourses] = useState<number>(0);
   const [complete, setComplete] = useState<number>(0);
 
-  const calculateCompletedCourses = (courses: LessonSection[]) => {
+  const calculateCourseCompletion = (courses: LessonSection[]) => {
     const completedCourses = courses.reduce((acc, current) => {
       const completedCourses = current.contents.filter(
         (c) => c.completed == true
@@ -29,7 +29,10 @@ function App() {
     return completedCourses || 0;
   };
 
-  const onSelectContent = (activeSection: string, activeContent: string) => {
+  const handleSelectContent = (
+    activeSection: string,
+    activeContent: string
+  ) => {
     if (!sections) return;
 
     // get active section
@@ -126,7 +129,7 @@ function App() {
     }
   };
 
-  const onNext = () => {
+  const handleNextContent = () => {
     //Logic to save the completed:true
     if (sections) {
       const currentSectionIndex = sections?.findIndex(
@@ -142,16 +145,16 @@ function App() {
 
       // update local storage
       localStorage.setItem(courseStructure.name, JSON.stringify(sections));
-      setComplete(calculateCompletedCourses(sections));
+      setComplete(calculateCourseCompletion(sections));
 
       if (!content.nextSection || !content.nextContent) return;
-      onSelectContent(content.nextSection, content.nextContent);
+      handleSelectContent(content.nextSection, content.nextContent);
     }
   };
 
-  const onPrevious = () => {
+  const handlePreviousContent = () => {
     if (!content.previousSection || !content.previousContent) return;
-    onSelectContent(content.previousSection, content.previousContent);
+    handleSelectContent(content.previousSection, content.previousContent);
   };
 
   useEffect(() => {
@@ -164,7 +167,7 @@ function App() {
 
       // initialize component state
       setSections(allCourses);
-      setComplete(calculateCompletedCourses(allCourses));
+      setComplete(calculateCourseCompletion(allCourses));
       setTotalCourses(
         allCourses.reduce((acc, current) => acc + current.contents.length, 0)
       );
@@ -186,13 +189,22 @@ function App() {
         <h2>{Math.round((complete / totalCourses) * 100) + "% Completed"}</h2>
       </div>
       <div className="layout-top-nav bg-base-200 p-1">
-        <CourseControls onNext={onNext} onPrevious={onPrevious} />
+        <CourseControls
+          onNextContent={handleNextContent}
+          onPreviousContent={handlePreviousContent}
+        />
       </div>
       <div className="layout-side-nav bg-base-200">
-        <CourseSection sections={sections} onSelectContent={onSelectContent} />
+        <CourseSection
+          sections={sections}
+          onSelectContent={handleSelectContent}
+        />
       </div>
       <div className="layout-video">
-        <ContentPlayer src={content?.activeSrc || ""} />
+        <ContentPlayer
+          src={content?.activeSrc || ""}
+          onVideoEnd={handleNextContent}
+        />
       </div>
     </div>
   );
