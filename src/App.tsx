@@ -2,8 +2,8 @@ import "./App.css";
 
 import { useEffect, useState } from "react";
 import useContentStore from "./store";
-import courseStructure from "./assets/courses/course_react_1/structure.json";
-//import courseStructure from "./assets/courses/course_nextjs_1/structure.json";
+//import courseStructure from "./assets/courses/course_react_1/structure.json";
+import courseStructure from "./assets/courses/course_nextjs_1/structure.json";
 //import courseStructure from "./assets/courses/course_nextjs_2/structure.json";
 //import courseStructure from "./assets/courses/course_react_2/structure.json";
 import LessonSection from "./entities/LessonSection";
@@ -133,29 +133,40 @@ function App() {
   const handleNextContent = () => {
     //Logic to save the completed:true
     if (sections) {
-      const currentSectionIndex = sections?.findIndex(
+      const currentSection = sections?.find(
         (s) => s.name == content.activeSection
       );
-      const currentSection = sections[currentSectionIndex];
 
-      let activeContent = currentSection.contents.find(
+      let activeContent = currentSection?.contents.find(
         (c) => c.name == content.activeContent
       );
 
       // only update local storage if course is not completed
-      if (activeContent) activeContent.completed = true;
+      if (activeContent && activeContent.completed === false) {
+        const updatedSections = sections.map((s) => {
+          if (s.name !== content.activeSection) return s;
+          let completedContent = s.contents.map((c) =>
+            c.name !== content.activeContent ? c : { ...c, completed: true }
+          );
+          return { ...s, contents: completedContent };
+        });
 
-      // update local storage
-      localStorage.setItem(courseStructure.name, JSON.stringify(sections));
-      setComplete(calculateCourseCompletion(sections));
+        setSections(() => {
+          // update local storage
+          localStorage.setItem(
+            courseStructure.name,
+            JSON.stringify(updatedSections)
+          );
+          setComplete(calculateCourseCompletion(updatedSections));
+          return updatedSections;
+        });
+      }
 
       if (!content.nextSection || !content.nextContent) return;
-
       localStorage.setItem(
         `${courseStructure.name}_index`,
         JSON.stringify({ ...content })
       );
-
       handleSelectContent(content.nextSection, content.nextContent);
     }
   };
