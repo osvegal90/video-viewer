@@ -33,6 +33,9 @@ const CourseSection = ({ sections, onSelectContent }: Props) => {
                 />
 
                 <button
+                  autoFocus={
+                    activeContent == v.name && activeSection == section.name
+                  }
                   onClick={() => {
                     onSelectContent(section.name, v.name);
                   }}

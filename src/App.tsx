@@ -1,16 +1,17 @@
 import "./App.css";
-import CourseSection from "./component/CourseSection";
-import ContentPlayer from "./component/ContentPlayer";
+
 import { useEffect, useState } from "react";
+import useContentStore from "./store";
+import courseStructure from "./assets/courses/course_react_1/structure.json";
 //import courseStructure from "./assets/courses/course_nextjs_1/structure.json";
 //import courseStructure from "./assets/courses/course_nextjs_2/structure.json";
-import courseStructure from "./assets/courses/course_react_1/structure.json";
 //import courseStructure from "./assets/courses/course_react_2/structure.json";
-
-import useContentStore from "./store";
 import LessonSection from "./entities/LessonSection";
-import buildSrc from "./services/buildSrc";
+import Content from "./entities/Content";
 import CourseControls from "./component/CourseControls";
+import CourseSection from "./component/CourseSection";
+import ContentPlayer from "./component/ContentPlayer";
+import buildSrc from "./services/buildSrc";
 
 function App() {
   const { content, setContent } = useContentStore();
@@ -141,6 +142,7 @@ function App() {
         (c) => c.name == content.activeContent
       );
 
+      // only update local storage if course is not completed
       if (activeContent) activeContent.completed = true;
 
       // update local storage
@@ -148,6 +150,12 @@ function App() {
       setComplete(calculateCourseCompletion(sections));
 
       if (!content.nextSection || !content.nextContent) return;
+
+      localStorage.setItem(
+        `${courseStructure.name}_index`,
+        JSON.stringify({ ...content })
+      );
+
       handleSelectContent(content.nextSection, content.nextContent);
     }
   };
@@ -160,10 +168,12 @@ function App() {
   useEffect(() => {
     //load content to local storage if not already set
     const local = localStorage.getItem(courseStructure.name);
+    const index = localStorage.getItem(`${courseStructure.name}_index`);
 
     // set state if local storage is already set
-    if (local && local != null) {
+    if (local && local != null && index && index != null) {
       const allCourses: LessonSection[] = JSON.parse(local);
+      const indexContent: Content = JSON.parse(index);
 
       // initialize component state
       setSections(allCourses);
@@ -171,6 +181,8 @@ function App() {
       setTotalCourses(
         allCourses.reduce((acc, current) => acc + current.contents.length, 0)
       );
+      setContent(indexContent);
+
       return;
     }
 
@@ -178,6 +190,30 @@ function App() {
     localStorage.setItem(
       courseStructure.name,
       JSON.stringify(courseStructure.sections)
+    );
+
+    //initialize the first video that should run
+    localStorage.setItem(
+      `${courseStructure.name}_index`,
+      JSON.stringify({
+        activeSection: courseStructure.sections[0].name,
+        activeContent: courseStructure.sections[0].contents[0].name,
+        activeSrc: buildSrc(
+          courseStructure.name,
+          courseStructure.sections[0].name,
+          courseStructure.sections[0].contents[0].name
+        ),
+        nextSection: courseStructure.sections[0].name,
+        nextContent: courseStructure.sections[0].contents[1].name,
+        nextSrc: buildSrc(
+          courseStructure.name,
+          courseStructure.sections[0].name,
+          courseStructure.sections[0].contents[1].name
+        ),
+        previousSection: undefined,
+        previousContent: undefined,
+        previousSrc: undefined,
+      })
     );
   }, []);
 
